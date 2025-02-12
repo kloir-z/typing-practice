@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader } from './ui/card';
-import { Header } from './header';
+import { Header } from './Header';
 import { Settings } from './Settings';
 import { TypingArea } from './TypingArea';
 import { Stats } from './Stats';
