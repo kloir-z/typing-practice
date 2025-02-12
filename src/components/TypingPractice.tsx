@@ -93,7 +93,7 @@ const TypingPractice: React.FC = () => {
       className={`min-h-screen w-full ${isDarkMode ? 'dark bg-gray-900' : 'bg-gray-50'} ${isCursorIdle ? 'cursor-none' : ''
         }`}
     >
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 max-w-3xl">
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
             <Header

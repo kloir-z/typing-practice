@@ -1,24 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 const THEME_KEY = 'typing-theme';
 
 export const useTheme = () => {
-    const [isDarkMode, setIsDarkMode] = useState(true);
-
-    useEffect(() => {
+    const [isDarkMode, setIsDarkMode] = useState(() => {
         const savedTheme = localStorage.getItem(THEME_KEY);
-        if (savedTheme) {
-            setIsDarkMode(savedTheme === 'dark');
-        } else {
-            setIsDarkMode(true);
-            localStorage.setItem(THEME_KEY, 'dark');
-        }
-    }, []);
+        return savedTheme ? savedTheme === 'dark' : true;
+    });
 
-    useEffect(() => {
-        document.documentElement.classList.toggle('dark', isDarkMode);
-        localStorage.setItem(THEME_KEY, isDarkMode ? 'dark' : 'light');
-    }, [isDarkMode]);
+    const updateTheme = (dark: boolean) => {
+        setIsDarkMode(dark);
+        localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
+        document.documentElement.classList.toggle('dark', dark);
+    };
 
-    return [isDarkMode, setIsDarkMode] as const;
+    return [isDarkMode, updateTheme] as const;
 };
