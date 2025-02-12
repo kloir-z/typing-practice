@@ -23,6 +23,7 @@ const TypingPractice: React.FC = () => {
     if (reset && generatePracticeText && typingAreaRef.current) {
       reset();
       generatePracticeText();
+      setShowRecords(false);
       typingAreaRef.current.focus();
     }
   };
@@ -55,32 +56,37 @@ const TypingPractice: React.FC = () => {
     if (!isRunning) {
       setShowRecords(!showRecords);
       setShowSettings(false);
+      if (!showRecords) {
+        reset();
+      }
     }
   };
 
   useEffect(() => {
-    if (typingAreaRef.current) {
+    if (typingAreaRef.current && !showRecords) {
       typingAreaRef.current.focus();
     }
-  }, []);
+  }, [showRecords]);
 
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleKeyDown]);
+    if (!showRecords) {
+      document.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [handleKeyDown, showRecords]);
 
   useEffect(() => {
     const handleFocus = () => {
-      if (isRunning && typingAreaRef.current) {
+      if (isRunning && typingAreaRef.current && !showRecords) {
         typingAreaRef.current.focus();
       }
     };
 
     window.addEventListener('click', handleFocus);
     return () => window.removeEventListener('click', handleFocus);
-  }, [isRunning]);
+  }, [isRunning, showRecords]);
 
   return (
     <div
