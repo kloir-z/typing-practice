@@ -62,6 +62,15 @@ const TypingPractice: React.FC = () => {
     }
   };
 
+  const handleToggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+    if (typingAreaRef.current && !showRecords) {
+      setTimeout(() => {
+        typingAreaRef.current?.focus();
+      }, 0);
+    }
+  };
+
   useEffect(() => {
     if (typingAreaRef.current && !showRecords) {
       typingAreaRef.current.focus();
@@ -99,7 +108,7 @@ const TypingPractice: React.FC = () => {
             <Header
               isDarkMode={isDarkMode}
               onToggleSettings={handleToggleSettings}
-              onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
+              onToggleDarkMode={handleToggleDarkMode}
               onToggleRecords={handleToggleRecords}
               onReset={handleReset}
               isRunning={isRunning}
