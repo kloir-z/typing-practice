@@ -10,23 +10,51 @@ import { useTheme } from '../hooks/useTheme';
 import { useCharacterSet } from '../hooks/useCharacterSet';
 import { useTypingGame } from '../hooks/useTypingGame';
 import { usePracticeText } from '../hooks/usePracticeText';
+import { useCursorIdle } from '../hooks/useCursorIdle';
 import { defaultCharSets } from '../lib/charSets';
 
 const TypingPractice: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useTheme();
-  const { currentCharSet, handleChangeCharSet } = useCharacterSet();
-  const [text, generatePracticeText] = usePracticeText(currentCharSet);
-  const { input, elapsedTime, mistakes, records, reset, handleKeyDown } = useTypingGame(text, currentCharSet);
-  
   const [showRecords, setShowRecords] = React.useState(false);
   const [showSettings, setShowSettings] = React.useState(false);
   const typingAreaRef = useRef<HTMLDivElement>(null);
 
   const handleReset = () => {
-    reset();
-    generatePracticeText();
-    if (typingAreaRef.current) {
+    if (reset && generatePracticeText && typingAreaRef.current) {
+      reset();
+      generatePracticeText();
       typingAreaRef.current.focus();
+    }
+  };
+
+  const { currentCharSet, handleChangeCharSet } = useCharacterSet(handleReset);
+
+  const [text, generatePracticeText] = usePracticeText(currentCharSet);
+
+  const {
+    input,
+    elapsedTime,
+    mistakes,
+    records,
+    isRunning,
+    isComplete,
+    reset,
+    handleKeyDown
+  } = useTypingGame(text, currentCharSet);
+
+  const isCursorIdle = useCursorIdle(isRunning);
+
+  const handleToggleSettings = () => {
+    if (!isRunning) {
+      setShowSettings(!showSettings);
+      setShowRecords(false);
+    }
+  };
+
+  const handleToggleRecords = () => {
+    if (!isRunning) {
+      setShowRecords(!showRecords);
+      setShowSettings(false);
     }
   };
 
@@ -43,19 +71,34 @@ const TypingPractice: React.FC = () => {
     };
   }, [handleKeyDown]);
 
+  useEffect(() => {
+    const handleFocus = () => {
+      if (isRunning && typingAreaRef.current) {
+        typingAreaRef.current.focus();
+      }
+    };
+
+    window.addEventListener('click', handleFocus);
+    return () => window.removeEventListener('click', handleFocus);
+  }, [isRunning]);
+
   return (
-    <div className={`min-h-screen w-full ${isDarkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+    <div
+      className={`min-h-screen w-full ${isDarkMode ? 'dark bg-gray-900' : 'bg-gray-50'} ${isCursorIdle ? 'cursor-none' : ''
+        }`}
+    >
       <div className="container mx-auto px-4 py-8">
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
             <Header
               isDarkMode={isDarkMode}
-              onToggleSettings={() => setShowSettings(!showSettings)}
+              onToggleSettings={handleToggleSettings}
               onToggleDarkMode={() => setIsDarkMode(!isDarkMode)}
-              onToggleRecords={() => setShowRecords(!showRecords)}
+              onToggleRecords={handleToggleRecords}
               onReset={handleReset}
+              isRunning={isRunning}
             />
-            {showSettings && (
+            {showSettings && !isRunning && (
               <Settings
                 charSets={defaultCharSets}
                 currentCharSet={currentCharSet}
@@ -76,7 +119,7 @@ const TypingPractice: React.FC = () => {
                   mistakes={mistakes}
                 />
                 <CompletionMessage
-                  isComplete={input.length === text.length}
+                  isComplete={isComplete}
                 />
               </>
             ) : (

@@ -15,6 +15,7 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
     const [startTime, setStartTime] = useState<number | null>(null);
     const [elapsedTime, setElapsedTime] = useState<number>(0);
     const [isRunning, setIsRunning] = useState<boolean>(false);
+    const [isComplete, setIsComplete] = useState<boolean>(false);
     const [mistakes, setMistakes] = useState<number>(0);
     const [records, setRecords] = useState<Record[]>([]);
 
@@ -52,10 +53,15 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
         setStartTime(null);
         setElapsedTime(0);
         setIsRunning(false);
+        setIsComplete(false);
         setMistakes(0);
     }, []);
 
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
+        if (isComplete) {
+            return;
+        }
+
         if (!isRunning && !startTime && e.key.length === 1) {
             setStartTime(Date.now());
             setIsRunning(true);
@@ -70,24 +76,24 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
             const newInput = input + e.key;
             setInput(newInput);
 
-            let newMistakes = mistakes;
             if (e.key !== text[input.length]) {
-                newMistakes++;
+                setMistakes(prev => prev + 1);
             }
-            setMistakes(newMistakes);
 
             if (newInput.length === text.length) {
                 setIsRunning(false);
-                saveRecord(elapsedTime, newMistakes);
+                setIsComplete(true);
+                saveRecord(elapsedTime, mistakes);
             }
         }
-    }, [text, input, startTime, isRunning, elapsedTime, mistakes, saveRecord]);
+    }, [text, input, startTime, isRunning, isComplete, elapsedTime, mistakes, saveRecord]);
 
     return {
         input,
         elapsedTime,
         mistakes,
         isRunning,
+        isComplete,
         records,
         reset,
         handleKeyDown

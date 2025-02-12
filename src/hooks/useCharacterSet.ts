@@ -3,7 +3,7 @@ import { CharacterSet, defaultCharSets } from '../lib/charSets';
 
 const CHAR_SET_KEY = 'typing-char-set';
 
-export const useCharacterSet = () => {
+export const useCharacterSet = (onChangeCallback?: () => void) => {
     const [currentCharSet, setCurrentCharSet] = useState<CharacterSet>(defaultCharSets[0]);
 
     useEffect(() => {
@@ -21,6 +21,9 @@ export const useCharacterSet = () => {
         if (newCharSet) {
             setCurrentCharSet(newCharSet);
             localStorage.setItem(CHAR_SET_KEY, charSetId);
+            if (onChangeCallback) {
+                onChangeCallback();
+            }
         }
     };
 

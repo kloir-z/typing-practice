@@ -8,6 +8,7 @@ interface HeaderProps {
     onToggleDarkMode: () => void;
     onToggleRecords: () => void;
     onReset: () => void;
+    isRunning: boolean;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -15,16 +16,18 @@ export const Header: React.FC<HeaderProps> = ({
     onToggleSettings,
     onToggleDarkMode,
     onToggleRecords,
-    onReset
+    onReset,
+    isRunning
 }) => (
     <CardTitle className="flex justify-between items-center text-3xl dark:text-white">
         <span>全文字タイピング練習</span>
         <div className="flex gap-2">
             <button
                 onClick={onToggleSettings}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full dark:text-gray-300"
+                className={`p-2 ${isRunning ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-700'} rounded-full dark:text-gray-300`}
                 aria-label="設定"
                 title="設定"
+                disabled={isRunning}
             >
                 <Settings className="w-6 h-6" />
             </button>
@@ -38,9 +41,10 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
             <button
                 onClick={onToggleRecords}
-                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full dark:text-gray-300"
+                className={`p-2 ${isRunning ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100 dark:hover:bg-gray-700'} rounded-full dark:text-gray-300`}
                 aria-label="記録を見る"
                 title="記録を見る"
+                disabled={isRunning}
             >
                 <Trophy className="w-6 h-6" />
             </button>
