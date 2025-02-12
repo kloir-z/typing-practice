@@ -25,11 +25,3 @@ export const defaultCharSets: CharacterSet[] = [
         description: '記号のみ'
     },
 ];
-
-export interface CustomCharSet extends CharacterSet {
-    isCustom: true;
-}
-
-export function isCustomCharSet(charSet: CharacterSet): charSet is CustomCharSet {
-    return 'isCustom' in charSet;
-}
