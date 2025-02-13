@@ -9,6 +9,7 @@ interface Record {
 }
 
 const STORAGE_KEY = 'typing-records';
+const INPUT_BUFFER = 5;
 
 export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
     const [input, setInput] = useState<string>('');
@@ -57,6 +58,10 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
         setMistakes(0);
     }, []);
 
+    const isInputCorrect = useCallback(() => {
+        return input === text.slice(0, input.length);
+    }, [input, text]);
+
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (isComplete) {
             return;
@@ -73,6 +78,10 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
         }
 
         if (e.key.length === 1) {
+            if (input.length >= text.length + INPUT_BUFFER) {
+                return;
+            }
+
             const newInput = input + e.key;
             setInput(newInput);
 
@@ -80,7 +89,7 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
                 setMistakes(prev => prev + 1);
             }
 
-            if (newInput.length === text.length) {
+            if (newInput.length === text.length && newInput === text) {
                 setIsRunning(false);
                 setIsComplete(true);
                 saveRecord(elapsedTime, mistakes);
@@ -96,6 +105,7 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
         isComplete,
         records,
         reset,
-        handleKeyDown
+        handleKeyDown,
+        isInputCorrect
     };
 };
