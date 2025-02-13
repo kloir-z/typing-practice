@@ -40,7 +40,8 @@ const TypingPractice: React.FC = () => {
     isRunning,
     isComplete,
     reset,
-    handleKeyDown
+    handleKeyDown,
+    clearRecords
   } = useTypingGame(text, currentCharSet);
 
   const isCursorIdle = useCursorIdle(isRunning);
@@ -135,7 +136,10 @@ const TypingPractice: React.FC = () => {
                 />
               </>
             ) : (
-              <Records records={records} />
+              <Records
+                records={records}
+                onClearRecords={clearRecords}
+              />
             )}
           </CardContent>
         </Card>

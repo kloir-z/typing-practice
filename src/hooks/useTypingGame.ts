@@ -38,6 +38,11 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
         return () => clearInterval(intervalId);
     }, [isRunning]);
 
+    const clearRecords = useCallback(() => {
+        setRecords([]);
+        localStorage.removeItem(STORAGE_KEY);
+    }, []);
+
     const saveRecord = useCallback((time: number, mistakes: number) => {
         const newRecord: Record = {
             timestamp: Date.now(),
@@ -115,6 +120,7 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
         records,
         reset,
         handleKeyDown,
-        isInputCorrect
+        isInputCorrect,
+        clearRecords
     };
 };

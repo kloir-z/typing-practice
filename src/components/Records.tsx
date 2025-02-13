@@ -1,16 +1,21 @@
 import React from 'react';
 import { defaultCharSets } from '../lib/charSets';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Trash2 } from 'lucide-react';
 
-interface RecordsProps {
-    records: Array<{
-        timestamp: number;
-        time: number;
-        mistakes: number;
-        charSetId: string;
-    }>;
+interface Record {
+    timestamp: number;
+    time: number;
+    mistakes: number;
+    charSetId: string;
 }
 
-export const Records: React.FC<RecordsProps> = ({ records }) => {
+interface RecordsProps {
+    records: Record[];
+    onClearRecords: () => void;
+}
+
+export const Records: React.FC<RecordsProps> = ({ records, onClearRecords }) => {
     const formatDate = (timestamp: number) => {
         return new Date(timestamp).toLocaleString('ja-JP', {
             year: 'numeric',
@@ -23,7 +28,42 @@ export const Records: React.FC<RecordsProps> = ({ records }) => {
 
     return (
         <div className="space-y-4">
-            <h3 className="text-xl font-semibold mb-4 dark:text-white">記録一覧（保存件数: {records.length}件）</h3>
+            <div className="flex justify-between items-center mb-4">
+                <h3 className="text-xl font-semibold dark:text-white">
+                    記録一覧（保存件数: {records.length}件）
+                </h3>
+                {records.length > 0 && (
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <button
+                                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                                aria-label="履歴をクリア"
+                            >
+                                <Trash2 className="w-5 h-5" />
+                                <span>履歴をクリア</span>
+                            </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>履歴のクリア確認</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    すべての記録が削除されます。この操作は取り消せません。
+                                    実行してもよろしいですか？
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>キャンセル</AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={onClearRecords}
+                                    className="bg-red-600 hover:bg-red-700"
+                                >
+                                    削除する
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                )}
+            </div>
             <div className="space-y-2">
                 {records.map((record, index) => (
                     <div key={record.timestamp} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded">
