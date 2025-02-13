@@ -10,6 +10,7 @@ interface Record {
 
 const STORAGE_KEY = 'typing-records';
 const INPUT_BUFFER = 5;
+const MAX_RECORDS = 1000;
 
 export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
     const [input, setInput] = useState<string>('');
@@ -44,7 +45,15 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
             mistakes,
             charSetId: currentCharSet.id
         };
-        const updatedRecords = [...records, newRecord].sort((a, b) => a.time - b.time);
+        const updatedRecords = [...records, newRecord]
+            .sort((a, b) => {
+                if (a.time === b.time) {
+                    return a.mistakes - b.mistakes;
+                }
+                return a.time - b.time;
+            })
+            .slice(0, MAX_RECORDS);
+
         setRecords(updatedRecords);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedRecords));
     }, [records, currentCharSet]);
