@@ -56,9 +56,6 @@ const TypingPractice: React.FC = () => {
     if (!isRunning) {
       setShowRecords(!showRecords);
       setShowSettings(false);
-      if (!showRecords) {
-        reset();
-      }
     }
   };
 
