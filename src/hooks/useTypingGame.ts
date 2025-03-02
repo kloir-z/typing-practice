@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { CharacterSet } from '../lib/charSets';
 
 interface Record {
@@ -20,6 +20,20 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
     const [isComplete, setIsComplete] = useState<boolean>(false);
     const [mistakes, setMistakes] = useState<number>(0);
     const [records, setRecords] = useState<Record[]>([]);
+
+    const displayText = text;
+
+    const charMap = useMemo(() => {
+        const map: { char: string, index: number }[] = [];
+        const processedText = displayText.replace(/\n/g, ' ');
+        const textChars = processedText.split('');
+
+        textChars.forEach((char, index) => {
+            map.push({ char, index });
+        });
+
+        return map;
+    }, [displayText]);
 
     useEffect(() => {
         const savedRecords = localStorage.getItem(STORAGE_KEY);
@@ -73,8 +87,13 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
     }, []);
 
     const isInputCorrect = useCallback(() => {
-        return input === text.slice(0, input.length);
-    }, [input, text]);
+        for (let i = 0; i < input.length; i++) {
+            if (i >= charMap.length || input[i] !== charMap[i].char) {
+                return false;
+            }
+        }
+        return true;
+    }, [input, charMap]);
 
     const handleKeyDown = useCallback((e: KeyboardEvent) => {
         if (isComplete) {
@@ -92,24 +111,37 @@ export const useTypingGame = (text: string, currentCharSet: CharacterSet) => {
         }
 
         if (e.key.length === 1) {
-            if (input.length >= text.length + INPUT_BUFFER) {
+            if (input.length >= charMap.length + INPUT_BUFFER) {
                 return;
             }
 
             const newInput = input + e.key;
             setInput(newInput);
 
-            if (e.key !== text[input.length]) {
-                setMistakes(prev => prev + 1);
+            if (input.length < charMap.length) {
+                const expectedChar = charMap[input.length].char;
+                if (e.key !== expectedChar) {
+                    setMistakes(prev => prev + 1);
+                }
             }
 
-            if (newInput.length === text.length && newInput === text) {
+            if (newInput.length === charMap.length && isInputCorrect()) {
                 setIsRunning(false);
                 setIsComplete(true);
                 saveRecord(elapsedTime, mistakes);
             }
         }
-    }, [text, input, startTime, isRunning, isComplete, elapsedTime, mistakes, saveRecord]);
+    }, [
+        charMap,
+        elapsedTime,
+        input,
+        isComplete,
+        isInputCorrect,
+        isRunning,
+        mistakes,
+        saveRecord,
+        startTime
+    ]);
 
     return {
         input,

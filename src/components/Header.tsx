@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
     isRunning
 }) => (
     <CardTitle className="flex justify-between items-center text-3xl dark:text-white">
-        <span>全文字タイピング練習</span>
+        <span>ランダムタイピング</span>
         <div className="flex gap-2">
             <button
                 onClick={onToggleSettings}
